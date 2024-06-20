@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P5</title>
+  <link rel="stylesheet" href="./src/css/style.css">
+</head>
+<body>
+
+
+  <div class="container">
+    <section class="map" id="map"></section>
+
+    <section class="chatbox" id="chatbox">
+      <div class="chatlog" id="root">
+        <!-- Aqui apareceriam as mensagens do chat -->
+      </div>
+      <div class="chatinput">
+        <input type="text" id="userName" placeholder="Digite seu nome de usuário..." />
+        <input type="text" id="user-input" placeholder="Digite sua mensagem aqui..." />
+        <button class="sendMessage">Enviar</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js" integrity="sha512-d6sc8kbZEtA2LwB9m/ck0FhvyUwVfdmvTeyJRprmj7Wg9wRFtHDIpr6qk4g/y3Ix3O9I6KHIv6SGu9f7RaP1Gw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- <script defer src="js/voiceflow.js"></script> -->
+  <script type="module" src="src/js/together.js"></script>
+</body>
+</html>

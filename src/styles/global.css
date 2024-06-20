@@ -1,0 +1,46 @@
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 0.2px;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+h1 {
+  font-family: 'Noto Serif', serif;
+  font-size: 39px;
+  line-height: 42px;
+  margin-bottom: 50px;
+
+}
+
+h2 {
+  font-family: 'Noto Serif', serif;
+  font-size: 28px;
+  line-height: 30px;
+  text-align: center;
+  color: #333;
+  margin-block-start: 40px;
+  margin-block-end: 30px;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+p {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

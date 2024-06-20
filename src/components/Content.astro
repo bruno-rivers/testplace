@@ -1,0 +1,35 @@
+---
+
+---
+
+<div class="content">
+  <div class="content-box">
+    <slot />
+  </div>
+</div>
+<style>
+  .content {
+    background-color: #ecf0f1;
+    color: #34495e;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px red solid; */
+  }
+
+  .content-box::-webkit-scrollbar {
+    display: none;
+  }
+
+  .content-box {
+    /* border: 1px red solid; */
+    height: 100vh;
+    width: 90%;
+    text-align: center;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>

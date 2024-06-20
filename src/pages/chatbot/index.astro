@@ -1,0 +1,204 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Chatbot">
+  <div class="chatbot-page">
+    <div class="chatlog"></div>
+    <div class="user-panel">
+      <div class="user-input">
+        <textarea
+          name="user-input"
+          rows="1"
+          contenteditable="true"
+          placeholder="Type a message"></textarea>
+        <button type="submit">Send</button>
+      </div>
+    </div>
+  </div>
+</Layout>
+<style>
+  .chatbot-page {
+    /* border: 1px red solid; */
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chatlog {
+    /* border: 1px red solid; */
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+
+  .chatlog,
+  .user-input textarea {
+    --sb-track-color: #ecf0f1;
+    --sb-thumb-color: #34495e;
+    --sb-size: 4px;
+  }
+
+  .chatlog::-webkit-scrollbar,
+  .user-input textarea::-webkit-scrollbar {
+    width: var(--sb-size);
+  }
+
+  .chatlog::-webkit-scrollbar-track,
+  .user-input textarea::-webkit-scrollbar-track {
+    background: var(--sb-track-color);
+    border-radius: 2px;
+  }
+
+  .chatlog::-webkit-scrollbar-thumb,
+  .user-input textarea::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb-color);
+    border-radius: 2px;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .chatlog,
+    .user-input textarea {
+      scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+    }
+  }
+
+  :global(.message) {
+    margin: 10px 10px;
+    padding: 10px;
+    border-radius: 1em;
+    max-width: 70%;
+  }
+
+  :global(.message.received) {
+    align-self: flex-start;
+    background-color: #ccb176;
+    width: fit-content;
+  }
+
+  :global(.message.sent) {
+    align-self: flex-end;
+    background-color: #98cc76;
+    width: fit-content;
+    border-radius: 1em;
+  }
+
+  :global(.message-text) {
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 70%;
+    text-align: justify;
+    word-wrap: break-word;
+    font-weight: 900;
+    color: #424242;
+  }
+
+  .user-panel {
+    /* border: 1px red solid; */
+    width: 100%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .user-input {
+    /* border: 1px red solid; */
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-input textarea {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    resize: none;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    height: fit-content;
+  }
+
+  .user-input textarea:focus {
+    overflow-y: scroll;
+  }
+
+  .user-input button {
+    width: 20%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .user-input button:hover {
+    background-color: #2980b9;
+  }
+</style>
+<script>
+  const chatlog = document.querySelector(".chatlog");
+  const userInput = document.querySelector(".user-input textarea");
+  const sendButton = document.querySelector(".user-input button");
+
+  sendButton.addEventListener("click", () => {
+    const message = userInput.value;
+    const messageText = document.createElement("span");
+    const messageElement = document.createElement("div");
+
+    messageText.classList.add("message-text");
+    messageElement.classList.add("message");
+    messageElement.classList.add("sent");
+    messageElement.appendChild(messageText);
+    messageText.textContent = message;
+    chatlog.appendChild(messageElement);
+    userInput.value = "";
+    responseHandler(message);
+  });
+    
+
+    async function responseHandler(response: string): Promise<any> {
+      const options = {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization:
+            "Bearer 6149c19f50cb2c596dee8c3efc7e55919433737f56540f12be691aa1fed9d850",
+        },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: `${response}` }],
+          model: "meta-llama/Llama-3-70b-chat-hf",
+          max_tokens: 1024,
+        }),
+      };
+
+      fetch("https://api.together.xyz/v1/chat/completions", options)
+        .then((response) => response.json())
+        .then((response) => showMessage(response.choices[0].message.content))
+        .catch((err) => console.error(err));
+    };
+
+    function showMessage(message: string) {
+      const messageText = document.createElement("span");
+      const messageElement = document.createElement("div");
+      messageText.classList.add("message-text");
+      messageElement.classList.add("message");
+      messageElement.classList.add("received");
+      messageElement.appendChild(messageText);
+      messageText.textContent = message;
+      chatlog.appendChild(messageElement);
+    }
+</script>
