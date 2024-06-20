@@ -4,15 +4,16 @@ import Layout from "../../layouts/Layout.astro";
 
 <Layout title="Chatbot">
   <div class="chatbot-page">
-    <div class="chatlog"></div>
+    <div id="chatlog" class="chatlog"></div>
     <div class="user-panel">
       <div class="user-input">
         <textarea
-          name="user-input"
+        id="input"
+          name="input"
           rows="1"
           contenteditable="true"
           placeholder="Type a message"></textarea>
-        <button type="submit">Send</button>
+        <button id="input-btn" type="submit">Send</button>
       </div>
     </div>
   </div>
@@ -147,11 +148,12 @@ import Layout from "../../layouts/Layout.astro";
   .user-input button:hover {
     background-color: #2980b9;
   }
+
 </style>
 <script>
-  const chatlog = document.querySelector(".chatlog");
-  const userInput = document.querySelector(".user-input textarea");
-  const sendButton = document.querySelector(".user-input button");
+  const chatlog = document.getElementById("chatlog");
+  const userInput = document.getElementById("input");
+  const sendButton = document.getElementById("input-btn");
 
   sendButton.addEventListener("click", () => {
     const message = userInput.value;

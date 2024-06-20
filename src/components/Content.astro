@@ -3,6 +3,11 @@
 ---
 
 <div class="content">
+  <div id="open-btn" class="open-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
   <div class="content-box">
     <slot />
   </div>
@@ -32,4 +37,41 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .open-btn {
+  display: block;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.open-btn span {
+  display: block;
+  height: 4px;
+  background-color: #34495e;
+  margin-bottom: 5px;
+  transition: transform 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+
+  .content {
+    flex-grow: 0;
+    width: 100%;
+  }
+
+  .content-box {
+    width: 100%;
+    height: 100%;
+  }
+
+  .open-btn.show {
+    display: block;
+  }
+
+}
 </style>

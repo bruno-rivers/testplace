@@ -1,11 +1,8 @@
 ---
-import Navbar from "../components/Navbar.astro";
 import Menu from "../components/Menu.astro";
 import Content from "../components/Content.astro";
 import "../styles/global.css";
-interface Props {
-	title: string;
-}
+
 const { title } = Astro.props;
 ---
 
@@ -22,7 +19,7 @@ const { title } = Astro.props;
 	<body>
 		<div class="container">
 			<Menu />
-			<Content>
+			<Content >
 				<slot />
 			</Content>
 		</div>
@@ -33,6 +30,24 @@ const { title } = Astro.props;
     display: flex;
     height: 100vh;
 }
-
-
 </style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("sidebar");
+    // const backdrop = document.getElementById("backdrop");
+    const openButton = document.getElementById("open-btn");
+    const closeButton = document.getElementById("close-btn");
+    const toggleSidebar = (show) => {
+        sidebar.style.display = show ? "flex" : "none";
+		openButton.style.display = show ? "none" : "block";
+        // backdrop.style.display = show ? "block" : "none";
+    };
+    openButton.addEventListener("click", () => toggleSidebar(true));
+    closeButton.addEventListener("click", () => toggleSidebar(false));
+    // backdrop.addEventListener("click", () => toggleSidebar(false));
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") toggleSidebar(false);
+    });
+});
+</script>
