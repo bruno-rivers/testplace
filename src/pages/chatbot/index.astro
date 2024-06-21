@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import models from '../../data/models';
 ---
 
 <Layout title="Chatbot">
@@ -7,13 +8,32 @@ import Layout from "../../layouts/Layout.astro";
     <div id="chatlog" class="chatlog"></div>
     <div class="user-panel">
       <div class="user-input">
-        <textarea
-        id="input"
-          name="input"
-          rows="1"
-          contenteditable="true"
-          placeholder="Type a message"></textarea>
-        <button id="input-btn" type="submit">Send</button>
+        <div class="user-input-top">
+          <button type="button" class="contact-btn" id="open-contacts"
+            >Selecionar modelo</button
+          >
+          <span class="selected-contact">Modelo: </span>
+        </div>
+        <div class="user-input-bottom">
+          <textarea id="input" name="user-input" rows="1" contenteditable="true"
+          ></textarea>
+          <button type="submit" id="send-btn" class="send-btn">Send</button>
+        </div>
+      </div>
+      <div class="modal-display">
+        <div class="modal" id="modal">
+        <div class="modal-content">
+          <span class="close" id="close-contacts">&times;</span>
+          <h2>Contacts</h2>
+          <ul class="contact-list">
+            {
+              models.map((item) => (
+                  <li class="contact-option" data-modelString={item.modelStringAPI}>{item.model}</li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>      
       </div>
     </div>
   </div>
@@ -25,6 +45,7 @@ import Layout from "../../layouts/Layout.astro";
     height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   .chatlog {
@@ -107,17 +128,111 @@ import Layout from "../../layouts/Layout.astro";
   }
 
   .user-input {
-    /* border: 1px red solid; */
-    width: 100%;
-    padding: 10px;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-end;
     align-items: center;
     gap: 10px;
+    width: 100%;
   }
 
-  .user-input textarea {
+  .user-input-top {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+  }
+
+  .contact-btn {
+    padding: 10px;
+    width: 100%;
+    max-width: 27vw;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .contact-btn:hover {
+    background-color: #2980b9;
+  }
+
+  .modal {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;      
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    height: 50vh;
+    width: 50%;
+    overflow-y: auto;
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .contact-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .contact-list li:hover {
+    cursor: pointer;
+    background-color: #f2f2f2;
+  }
+
+  .selected-contact {
+    font-size: 16px;
+    color: #34495e;
+    margin-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-input-bottom {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .user-input-bottom textarea {
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -129,11 +244,11 @@ import Layout from "../../layouts/Layout.astro";
     height: fit-content;
   }
 
-  .user-input textarea:focus {
+  .user-input-bottom textarea:focus {
     overflow-y: scroll;
   }
 
-  .user-input button {
+  .user-input-bottom button {
     width: 20%;
     padding: 10px;
     border: none;
@@ -145,17 +260,21 @@ import Layout from "../../layouts/Layout.astro";
     transition: background-color 0.3s ease-in-out;
   }
 
-  .user-input button:hover {
+  .user-input-bottom button:hover {
     background-color: #2980b9;
   }
-
 </style>
 <script>
   const chatlog = document.getElementById("chatlog");
   const userInput = document.getElementById("input");
-  const sendButton = document.getElementById("input-btn");
+  const sendButton = document.getElementById("send-btn");
+  let selectedModel = 'meta-llama/Llama-3-70b-chat-hf';
 
   sendButton.addEventListener("click", () => {
+    displayMessage()
+  });
+
+  function displayMessage(){
     const message = userInput.value;
     const messageText = document.createElement("span");
     const messageElement = document.createElement("div");
@@ -168,39 +287,97 @@ import Layout from "../../layouts/Layout.astro";
     chatlog.appendChild(messageElement);
     userInput.value = "";
     responseHandler(message);
-  });
-    
+  }
 
-    async function responseHandler(response: string): Promise<any> {
-      const options = {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          Authorization:
-            "Bearer 6149c19f50cb2c596dee8c3efc7e55919433737f56540f12be691aa1fed9d850",
-        },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: `${response}` }],
-          model: "meta-llama/Llama-3-70b-chat-hf",
-          max_tokens: 1024,
-        }),
-      };
-
-      fetch("https://api.together.xyz/v1/chat/completions", options)
-        .then((response) => response.json())
-        .then((response) => showMessage(response.choices[0].message.content))
-        .catch((err) => console.error(err));
+  async function responseHandler(response: string): Promise<any> {
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        Authorization:
+          "Bearer 6149c19f50cb2c596dee8c3efc7e55919433737f56540f12be691aa1fed9d850",
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: `${response}` }],
+        model: `${selectedModel}`,
+        max_tokens: 1024,
+      }),
     };
 
-    function showMessage(message: string) {
-      const messageText = document.createElement("span");
-      const messageElement = document.createElement("div");
-      messageText.classList.add("message-text");
-      messageElement.classList.add("message");
-      messageElement.classList.add("received");
-      messageElement.appendChild(messageText);
-      messageText.textContent = message;
-      chatlog.appendChild(messageElement);
+    fetch("https://api.together.xyz/v1/chat/completions", options)
+      .then((response) => response.json())
+      .then((response) => showMessage(response.choices[0].message.content))
+      .catch((err) => console.error(err));
+  }
+
+  function showMessage(message: string) {
+    const messageText = document.createElement("span");
+    const messageElement = document.createElement("div");
+    messageText.classList.add("message-text");
+    messageElement.classList.add("message");
+    messageElement.classList.add("received");
+    messageElement.appendChild(messageText);
+    messageText.textContent = message;
+    chatlog.appendChild(messageElement);
+  }
+
+document.getElementById('open-contacts').addEventListener('click', ()=>{showModal()})
+
+  function showModal() {
+    var modal = document.getElementById("modal");
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+document.getElementById('close-contacts').addEventListener('click', ()=>{hideModal()})
+
+  function hideModal() {
+    var modal = document.getElementById("modal");
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
+  window.addEventListener("click", function (event) {
+    var modal = document.getElementById("modal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
     }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var buttons = document.querySelectorAll(".contact-option");
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        var str = this.textContent;
+        selectContact(str);
+        selectedModel = button.getAttribute('data-modelString')
+        console.log(selectedModel);
+      });
+    });
+  });
+
+  function selectContact(contactName) {
+    var selectedContact = document.querySelector(".selected-contact");
+    selectedContact.textContent = "Modelo: " + contactName;
+    hideModal();
+  }
+
+  document.getElementById("input").addEventListener("keydown", (event) => {
+    sendMessageOnEnter(event);
+  });
+
+  function sendMessageOnEnter(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      var messageInput = document.getElementById("input");
+      var message = messageInput.value.trim();
+      if (message !== "") {
+        displayMessage();
+        messageInput.value = "";
+      }
+    }
+  }
 </script>
